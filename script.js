@@ -1,47 +1,83 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // Quote calculator functionality
+    const quoteForm = document.getElementById('quote-form');
+    if (quoteForm) {
+        const propertySize = quoteForm.querySelector('select');
+        const addOns = quoteForm.querySelectorAll('input[type="checkbox"]');
+        const totalDisplay = document.querySelector('#quote .text-4xl');
 
-    const form = document.getElementById('booking-form');
-    if (!form) return; // Only run if the quote tool exists on the page
+        const basePrices = {
+            'studio': 150,
+            '1bed': 200,
+            '2bed': 260,
+            '3bed': 320
+        };
 
-    const sizeSelect = document.getElementById('apartment-size');
-    const addOnCheckboxes = document.querySelectorAll('input[name="addon"]');
-    const totalPriceEl = document.getElementById('total-price');
+        // This now matches the 'name' attribute from the HTML
+        const addOnPrices = {
+            'oven': 30,
+            'fridge': 30,
+            'windows': 50
+        };
 
-    const BASE_PRICES = {
-        'studio': 150,
-        '1bed': 200,
-        '2bed': 260,
-        '3bed': 320
-    };
+        function calculateTotal() {
+            // 1. Get base price
+            let total = basePrices[propertySize.value];
+            
+            // 2. Add add-ons
+            addOns.forEach(addOn => {
+                // Check if the checkbox is checked and has a name
+                if (addOn.checked && addOn.name) {
+                    // Use the name (e.g., 'oven') as the key
+                    if (addOnPrices[addOn.name]) {
+                        total += addOnPrices[addOn.name];
+                    }
+                }
+            });
 
-    const ADDON_PRICES = {
-        'oven': 30,
-        'fridge': 30,
-        'windows': 50
-    };
+            // 3. Update the display
+            totalDisplay.textContent = `$${total.toFixed(2)}`;
+            totalDisplay.classList.add('animate-pop');
+            setTimeout(() => totalDisplay.classList.remove('animate-pop'), 300);
+        }
 
-    function calculateTotal() {
-        // 1. Get base price
-        let currentSize = sizeSelect.value;
-        let total = BASE_PRICES[currentSize];
+        propertySize.addEventListener('change', calculateTotal);
+        addOns.forEach(addOn => addOn.addEventListener('change', calculateTotal));
 
-        // 2. Add add-ons
-        addOnCheckboxes.forEach(checkbox => {
-            if (checkbox.checked) {
-                total += ADDON_PRICES[checkbox.value];
-            }
-        });
-
-        // 3. Update the display
-        totalPriceEl.textContent = `$${total.toFixed(2)}`;
+        // Initialize calculator
+        calculateTotal();
     }
 
-    // Add event listeners
-    sizeSelect.addEventListener('change', calculateTotal);
-    addOnCheckboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', calculateTotal);
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            const href = this.getAttribute('href');
+            const targetElement = document.querySelector(href);
+            if (targetElement) {
+                targetElement.scrollIntoView({
+                    behavior: 'smooth'
+                });
+            }
+        });
     });
 
-    // Initial calculation on page load
-    calculateTotal();
+    // Mobile menu toggle
+    const menuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    if (menuButton && mobileMenu) {
+        menuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+    }
+
+    // Close mobile menu when a link is clicked
+    if (mobileMenu) {
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', ()F => {
+                mobileMenu.classList.add('hidden');
+            });
+        });
+    }
 });
